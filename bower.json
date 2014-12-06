@@ -1,0 +1,20 @@
+{
+  "name": "athena",
+  "version": "0.0.1",
+  "homepage": "https://github.com/caraya/athena-framework",
+  "authors": [
+    "Carlos Araya <carlos.araya@gmail.com>"
+  ],
+  "description": "set of components for the athena proof of concept project",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "~0.5.1"
+  }
+}
