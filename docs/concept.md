@@ -1,10 +1,3 @@
----
-title: Project Athena: Concepts and ideas
-date: 2014-11-21
-category: Technology
-status: draft
----
-
 # Athena: A shot at convergence
 
 Reading is an activity we do alone and together. We read and then we discuss. We read and then wonder out loud how awesome or horrible the book was. Yet we do it separately

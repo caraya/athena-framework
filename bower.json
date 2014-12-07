@@ -15,6 +15,16 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "~0.5.1"
+    "polymer": "~0.5.1",
+    "core-dropdown": "polymer/core-dropdown#~0.5.1",
+    "core-header-panel": "polymer/core-header-panel#~0.5.1",
+    "core-toolbar": "polymer/core-toolbar#~0.5.1",
+    "core-icon-button": "polymer/core-icon-button#~0.5.1",
+    "core-menu": "polymer/core-menu#~0.5.1",
+    "core-item": "polymer/core-item#~0.5.1",
+    "core-scaffold": "polymer/core-scaffold#~0.5.1",
+    "paper-item": "polymer/paper-item#~0.5.1",
+    "core-elements": "polymer/core-elements#~0.5.1",
+    "paper-elements": "polymer/paper-elements#~0.5.1"
   }
 }
