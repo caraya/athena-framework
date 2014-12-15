@@ -1,0 +1,34 @@
+{
+  "publicaton": {
+    "metadata": {
+      "pub-type": "book",
+      "pub-date": "20141130",
+      "publisher": "Rivendell Press",
+      "authors": [
+        {
+          "firstName": "Carlos",
+          "lastName": "Araya"
+        }
+        ],
+      "editors": [
+        {
+          "role": "Production Editor",
+          "firstName": "John",
+          "lastName": "Watson"
+        }
+      ]
+    },
+    "structure": {
+      "content": [
+        {
+          "name": "Chapter 1",
+          "location": "content/chapter1.html"
+        },
+        {
+          "name": "Chapter 2",
+          "location": "content/chapter2.html"
+        }
+      ]
+    }
+  }
+}
