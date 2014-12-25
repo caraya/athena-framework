@@ -1,0 +1,80 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-scaffold/core-scaffold.html">
+<link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="../bower_components/core-icon/core-icon.html">
+<link rel="import" href="../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../bower_components/core-menu/core-menu.html">
+<link rel="import" href="../bower_components/core-menu/core-submenu.html">
+<link rel="import" href="../bower_components/core-item/core-item.html">
+
+<polymer-element name="sidebar-layout" attributes="selected" noscript>
+  <template>
+    <link rel="stylesheet" href="./sidebar-layout.css">
+    <core-scaffold>
+      <core-header-panel navigation flex mode="seamed">
+        <core-toolbar>Content Menu</core-toolbar>
+        <core-menu>
+          <a active?="{{selected == 'home'}}" href="/">
+            <core-item icon="home" label="Home"></core-item>
+          </a>
+          <core-submenu icon="list" label="Technologies">
+            <a active?="selected == 'concept'" href="concept.html">
+              <core-item icon="link" label="Concept"></core-item>
+            </a>
+            <a href="https://www.polymer-project.org">
+              <core-item icon="polymer" label="Polymer"></core-item>
+            </a>
+
+            <a href="https://jakearchibald.github.io/isserviceworkerready/">
+              <core-item icon="info-outline" label="ServiceWorkers"></core-item>
+            </a>
+
+            <a href="https://github.com/caraya/athena-framework">
+              <core-item icon="exit-to-app" label="Source Code"></core-item>
+            </a>
+          </core-submenu>
+
+          <core-submenu icon="list" label="Peter Pan Example">
+            <a href="peter-pan/ch01.html">
+              <core-item label="Chapter 1" icon="label-outline"></core-item>
+            </a>
+
+            <a href="peter-pan/ch02.html">
+              <core-item label="Chapter 2" icon="label-outline"></core-item>
+            </a>
+
+            <a href="peter-pan/ch03.html">
+              <core-item label="Chapter 3" icon="label-outline"></core-item>
+            </a>
+
+            <a href="peter-pan/ch04.html">
+              <core-item label="Chapter 4" icon="label-outline"></core-item>
+            </a>
+          </core-submenu>
+
+          <core-submenu icon="list" label="Pushing the envelope">
+            <core-item label="Labs" icon="label-outline">
+              <a href="http://labs.rivendellweb.net/"></a>
+            </core-item>
+            <core-item label="LinkedIn" icon="label-outline">
+              <a href="http://www.linkedin.com/in/carlosaraya/"></a>
+            </core-item>
+            <core-item label="Google Plus" icon="label-outline">
+              <a href="https://plus.google.com/+CarlosAraya25/posts/p/pub"></a>
+            </core-item>
+            <core-item label="Twitter" icon="label-outline">
+              <a href="http://twitter.com/elrond25"></a>
+            </core-item>
+          </core-submenu>
+        </core-menu>
+      </core-header-panel>
+      <div tool>
+        <content select=".title"></content>
+      </div>
+      <div class="content">
+        <content></content>
+      </div>
+    </core-scaffold>
+  </template>
+</polymer-element>

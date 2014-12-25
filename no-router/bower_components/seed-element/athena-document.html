@@ -1,0 +1,78 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<!-- athena-document specific-->
+<!-- AJAX to pull content -->
+<link rel="import" href="bower_components/core-ajax/core-ajax.html">
+<!-- Marked Markdown Parser -->
+<link rel="import" href="bower_components/marked-element/marked-element.html">
+<link rel="import" href="bower_components/marked-element/marked-import.html">
+<!-- Fonts -->
+<!-- Roboto -->
+<link rel="import" href="bower_components/font-roboto/roboto.html">
+<!-- Source Code Pro -->
+<link rel="import" href="bower_components/font-source-code.html">
+
+<!--
+Opinionated wrapper around marked element.
+
+##### Example
+
+    <athena-document url="path/to/markdown.md"></athena-document>
+
+@element athena-document
+@blurb Opinionated wrapper around marked element.
+@status alpha
+@homepage https://github.com/caraya/athena-document
+-->
+<polymer-element name="athena-document" attributes="url">
+  <style>
+    html {
+      font-family: 'RobotoLight', "Helvetica Neue", Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+    body {
+      padding-left: 2em;
+      padding-right: 2em;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'RobotoBold', Helvetica, "Helvetica Neue", Arial, sans-serif;
+    }
+    body pre {
+      padding: 1em;
+      background-color: #b3b3b3;
+      line-height: 1;
+    }
+    body /deep/ pre {
+      padding: 1em;
+      background-color: #b3b3b3;
+      line-height: 1;
+    }
+    body code {
+      font-family: "Source Code Pro", sans-serif;
+    }
+    body /deep/ code {
+      font-family: "Source Code Pro", sans-serif;
+    }
+  </style>
+  <template>
+    <core-ajax auto url="{{url}}" handleAs="text" response="{{doc}}">
+    </core-ajax>
+    <marked-element text="{{doc}}"></marked-element>
+  </template>
+  <script>
+    Polymer({
+      /**
+       * The `author` attribute sets an initial author
+       *
+       * @attribute author
+       * @type string
+       * @default 'Carlos Araya'
+       */
+      author: 'Carlos Araya'
+    });
+  </script>
+</polymer-element>
