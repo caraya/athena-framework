@@ -8,53 +8,20 @@
 
 // This polyfill provides Cache.add(), Cache.addAll(),
 // and CacheStorage.match(), which are not implemented in Chrome 40.
-importScripts('js/serviceworker-cache-polyfill.js');
+importScripts('./serviceworker-cache-polyfill.js');
+// The SW will be shutdown when not in use to save memory,
+// be aware that any global state is likely to disappear
+console.log("SW startup");
 
-var CACHE_NAME = 'athena-demo';
-var CACHE_VERSION = 3;
-debugger;
-self.oninstall = function(event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME + '-v' + CACHE_VERSION).then(function(cache) {
-      return cache.addAll([
-        '/bower_components/',
-        '/content/',
-        '/css/',
-        '/js/',
-        '/layouts/',
-        'index.html',
-        'notes.html',
-        'http://chimera.labs.oreilly.com/books/1230000000345/ch12.html',
-        'http://chimera.labs.oreilly.com/books/1230000000345/apa.html'
-      ]);
-    })
-  );
-};
+self.addEventListener('install', function(event) {
+  console.log("SW installed");
+});
 
-self.onactivate = function(event) {
-  console.log('I am an active serviceworker');
-  var currentCacheName = CACHE_NAME + '-v' + CACHE_VERSION;
-  caches.keys().then(function(cacheNames) {
-    return Promise.all(
-      cacheNames.map(function(cacheName) {
-        if (cacheName.indexOf(CACHE_NAME) == -1) {
-          return;
-        }
-
-        if (cacheName != currentCacheName) {
-          return caches.delete(cacheName);
-        }
-      })
-    );
-  });
-
-};
+self.addEventListener('activate', function(event) {
+  console.log("SW activated");
+});
 
 self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    cachesPolyfill.match(event.request).then(function(response) {
-      return response || fetch(event.request);
-      console.log("got resource" + event.request);
-    })
-  );
+  console.log("Caught a fetch!");
+  event.respondWith(new Response("Hello world!"));
 });
