@@ -20,12 +20,15 @@ if ('registerElement' in document
   document.write('<script src="bower_components/webcomponentsjs/webcomponents.js"><\/script>');
 }
 
+// Make sure we're on https as serviceworkers will only work on secure connections
+
+
 // Register Serviceworker
 if (navigator.serviceWorker) {
   // If Serviceworker is supported then register it
   // and log to console whether the promise fulfilled or rejected
   // Scope the serviceworker to match our application path
-  navigator.serviceWorker.register('/js/sw.js', {
+  navigator.serviceWorker.register('js/sw.js', {
     scope: '/athena-framework/'
   }).then(function(reg) {
     // Promise fullfilled
