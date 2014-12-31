@@ -9,15 +9,14 @@
 importScripts('js/serviceworker-cache-polyfill.js');
 
 var CACHE_NAME = 'athena-demo';
-var CACHE_VERSION = 1;
+var CACHE_VERSION = 6;
 
 self.oninstall = function(event) {
-debugger;
+
   event.waitUntil(
     caches.open(CACHE_NAME + '-v' + CACHE_VERSION).then(function(cache) {
 
       return cache.addAll([
-
         '/athena-framework/',
         '/athena-framework/bower_components/',
         '/athena-framework/css/',
@@ -27,13 +26,14 @@ debugger;
         '/athena-framework/content/',
         '/athena-framework/index.html',
         '/athena-framework/notes.html'
+
       ]);
     })
   );
 };
 
 self.onactivate = function(event) {
-debugger;
+
   var currentCacheName = CACHE_NAME + '-v' + CACHE_VERSION;
   caches.keys().then(function(cacheNames) {
     return Promise.all(
@@ -52,7 +52,6 @@ debugger;
 };
 
 self.onfetch = function(event) {
-debugger;
   var request = event.request;
   var requestURL = new URL(event.request.url);
 
@@ -72,10 +71,9 @@ debugger;
 
         caches.open(CACHE_NAME + '-v' + CACHE_VERSION).then(
           function(cache) {
-            cache.put(request, responseToCache)
-            console.log('put file on cache: ' + request);
-            .catch(function(err) {
-              // Likely we got an opaque response which the polyfill can't deal with, so log out a warning.
+            cache.put(request, responseToCache).catch(function(err) {
+              // Likely we got an opaque response which the polyfill
+              // can't deal with, so log out a warning.
               console.warn(requestURL + ': ' + err.message);
             });
           });
