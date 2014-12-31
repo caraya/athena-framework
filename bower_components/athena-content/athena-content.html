@@ -2,7 +2,95 @@
 <link ref="import" href="../font-roboto/roboto.html">
 <polymer-element name="athena-content" noscript>
   <template>
-    <link rel="stylesheet" href="../../css/content.css">
+    <style>/*
+ * Basic reset. It is not complete but a good starting point.
+ */
+html,
+body,
+div,
+img,
+p,
+a,
+ul,
+li {
+  margin:0;padding:0;
+}
+
+/*
+ * Web Font definition.
+ *
+ * We used the font-roboto component to define the base font
+ * for our documen
+ *
+ * GLOBAL STYLES
+ *
+ * Styles applied to the HTML element are used throughout the document unless
+ * a more specific style overrides it later
+ */
+html {
+      font-family: 'Roboto', "Helvetica Neue", Arial, Helvetica, sans-serif;
+      font-weight: 300;
+      line-height: 1.5;
+      padding-left: 2em;
+      padding-right: 2em;
+}
+
+/*
+ * Generic styles
+ *
+ * Styles using our fonts and other elements. We don't want faux italic and bold
+ * so we go through the xtra pain to add additional fonts.
+ */
+
+em {
+  font-family: 'Roboto';
+  font-style: italic;
+}
+
+strong {
+  font-family: 'Roboto';
+  font-weight: bold;
+}
+
+em strong,
+strong em { /* order of em and strong doesn't matter*/
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: bold;
+}
+
+pre {
+  font-family: 'Roboto';
+  font-weight: 300;
+}
+
+p { /* The default spacing between paragraphs looks too crowded to me, I like a little more breating room */
+  margin-bottom: 1em;
+}
+
+/*
+ * Indent all paragraphs but the first, we're doing too much with it already
+*/
+p:not(:first-child){
+  text-indent: 2em;
+}
+
+
+/*
+ * Links and anchor experiments
+ *
+ * External Links are underlined
+ * Internal links are not underlined
+ */
+
+a {
+  text-decoration: none;
+}
+
+a[href^="http"] {
+  text-decoration: underline;
+}
+</style>
     <content></content>
   </template>
 </polymer-element>
