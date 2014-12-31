@@ -27,8 +27,11 @@ if ('registerElement' in document
 if (navigator.serviceWorker) {
   // If Serviceworker is supported then register it
   // and log to console whether the promise fulfilled or rejected
-  // Scope the serviceworker to match our application path
-  navigator.serviceWorker.register('js/sw.js', {
+  //
+  // move the serviceworker to the root of the app to work around
+  // https://github.com/slightlyoff/ServiceWorker/issues/468
+  navigator.serviceWorker.register('sw.js', {
+    // Scope the serviceworker to match our application path
     scope: '/athena-framework/'
   }).then(function(reg) {
     // Promise fullfilled

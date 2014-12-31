@@ -11,7 +11,7 @@
 importScripts('./serviceworker-cache-polyfill.js');
 
 var CACHE_NAME = 'athena-demo';
-var CACHE_VERSION = 2;
+var CACHE_VERSION = 3;
 
 self.oninstall = function(event) {
   console.log('I installed successfully');
@@ -64,7 +64,6 @@ self.onactivate = function(event) {
 self.onfetch = function(event) {
   var request = event.request;
   var requestURL = new URL(event.request.url);
-  var userIsRequestingIndexPage = (requestURL.pathname === '/athena-framework/');
 
   event.respondWith(
 
