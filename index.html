@@ -24,11 +24,11 @@ if ('registerElement' in document
 
 
 // Register Serviceworker
-if (navigator.serviceWorker) {
+if (navigator.serviceWorker.register) {
   // If Serviceworker is supported then register it
   // and log to console whether the promise fulfilled or rejected
   //
-  // move the serviceworker to the root of the app to work around
+  // move the serviceworker to the root of the app to comply
   // https://github.com/slightlyoff/ServiceWorker/issues/468
   navigator.serviceWorker.register('sw.js', {
     // Scope the serviceworker to match our application path
