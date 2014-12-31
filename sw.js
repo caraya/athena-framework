@@ -1,13 +1,18 @@
 /**
- * ATHENA DEMO SERVICE WORKER
- * @author Carlos Araya
- * @email carlos.araya@gmail.com
+ * Copyright 2014 Google Inc. All rights reserved.
  *
- * Serviceworker for the demonstration athena publication.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Based (and liberally stolen from Jake Archibald's Trainer to thrill)
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 importScripts('js/serviceworker-cache-polyfill.js');
 
@@ -15,32 +20,23 @@ var CACHE_NAME = 'athena-demo';
 var CACHE_VERSION = 1;
 
 self.oninstall = function(event) {
+
   event.waitUntil(
     caches.open(CACHE_NAME + '-v' + CACHE_VERSION).then(function(cache) {
+
       return cache.addAll([
+
         '/athena-framework/',
+        '/athena-framework/bower_components/',
         '/athena-framework/css/',
         '/athena-framework/js/',
-        '/athena-framework/bower_components/',
+        '/devsummit/get-involved/',
+        '/athena-framework/layouts/',
+
         '/athena-framework/content/',
-        '/athena-framework/notes.html',
-        '/athena-framework/index.html'
+        '/athena-framework/index.html',
+        '/athena-framework/notes.html';
       ]);
-    })
-  );
-};
-
-self.onactivate = function(event) {
-
-  event.waitUntil(
-    caches.keys().then(function(cacheNames) {
-      return Promise.all(
-        cacheNames.map(function(cacheName) {
-          if (expectedCaches.indexOf(cacheName) == -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
     })
   );
 };
