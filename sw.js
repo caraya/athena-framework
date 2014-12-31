@@ -30,7 +30,6 @@ self.oninstall = function(event) {
         '/athena-framework/bower_components/',
         '/athena-framework/css/',
         '/athena-framework/js/',
-        '/devsummit/get-involved/',
         '/athena-framework/layouts/',
 
         '/athena-framework/content/',
@@ -80,7 +79,9 @@ self.onfetch = function(event) {
 
         caches.open(CACHE_NAME + '-v' + CACHE_VERSION).then(
           function(cache) {
-            cache.put(request, responseToCache).catch(function(err) {
+            cache.put(request, responseToCache)
+            console.log('put file on cache: ' + request);
+            .catch(function(err) {
               // Likely we got an opaque response which the polyfill
               // can't deal with, so log out a warning.
               console.warn(requestURL + ': ' + err.message);
