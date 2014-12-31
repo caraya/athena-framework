@@ -12,7 +12,7 @@ var CACHE_NAME = 'athena-demo';
 var CACHE_VERSION = 5;
 
 self.oninstall = function(event) {
-
+debugger;
   event.waitUntil(
     caches.open(CACHE_NAME + '-v' + CACHE_VERSION).then(function(cache) {
 
@@ -33,7 +33,7 @@ self.oninstall = function(event) {
 };
 
 self.onactivate = function(event) {
-
+debugger;
   var currentCacheName = CACHE_NAME + '-v' + CACHE_VERSION;
   caches.keys().then(function(cacheNames) {
     return Promise.all(
@@ -52,6 +52,7 @@ self.onactivate = function(event) {
 };
 
 self.onfetch = function(event) {
+debugger;
   var request = event.request;
   var requestURL = new URL(event.request.url);
 
