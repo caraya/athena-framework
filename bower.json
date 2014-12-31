@@ -1,30 +1,14 @@
 {
-  "name": "athena",
-  "version": "0.0.1",
-  "homepage": "https://github.com/caraya/athena-framework",
+  "name": "polymer-router-demos",
+  "version": "0.0.0",
   "authors": [
-    "Carlos Araya <carlos.araya@gmail.com>"
+    "Erik Ringsmuth <erik.ringsmuth@gmail.com>"
   ],
-  "description": "set of components for the athena proof of concept project",
   "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
   "dependencies": {
-    "polymer": "~0.5.1",
-    "core-dropdown": "polymer/core-dropdown#~0.5.1",
-    "core-header-panel": "polymer/core-header-panel#~0.5.1",
-    "core-toolbar": "polymer/core-toolbar#~0.5.1",
-    "core-icon-button": "polymer/core-icon-button#~0.5.1",
-    "core-menu": "polymer/core-menu#~0.5.1",
-    "core-item": "polymer/core-item#~0.5.1",
-    "core-scaffold": "polymer/core-scaffold#~0.5.1",
-    "paper-item": "polymer/paper-item#~0.5.1",
-    "core-elements": "polymer/core-elements#~0.5.1",
-    "paper-elements": "polymer/paper-elements#~0.5.1"
+    "polymer": "polymer/polymer#~0.5.2",
+    "webcomponentsjs": "polymer/webcomponents.js#~0.5.2",
+    "core-elements": "Polymer/core-elements#~0.5.1",
+    "juicy-markdown": "~0.0.2"
   }
 }

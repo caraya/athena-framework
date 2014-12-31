@@ -1,0 +1,405 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<!-- athena-document specific-->
+<!-- AJAX to pull content -->
+<link rel="import" href="bower_components/core-ajax/core-ajax.html">
+<!-- Marked Markdown Parser -->
+<link rel="import" href="bower_components/juicy-markdown/juicy-markdown.html">
+<!-- Fonts -->
+<!-- Roboto -->
+<link rel="import" href="bower_components/font-roboto/roboto.html">
+<!-- Source Code Pro -->
+<link rel="import" href="sourcecode.html">
+
+<!--
+Opinionated wrapper around marked element.
+
+##### Example
+
+    <athena-document url="path/to/markdown.md"></athena-document>
+
+@element athena-document
+@blurb Opinionated wrapper around juicy-markdown component.
+@status alpha
+@homepage https://github.com/caraya/athena-document
+-->
+<polymer-element name="athena-document" attributes="url" noscript>
+  <template>
+    <style>
+      body {
+        font-family: 'RobotoDraft', "Helvetica Neue", Arial, Helvetica, sans-serif;
+        font-weight: thin;
+        line-height: 1.5;
+        padding-left: 2em;
+        padding-right: 2em;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      body /deep/ h1,
+      body /deep/ h2,
+      body /deep/ h3,
+      body /deep/ h4,
+      body /deep/ h5,
+      body /deep/ h6 {
+        font-weight: 700;
+      }
+      h4,
+      body /deep/ h4 {
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: 1rem;
+      }
+      body pre,
+      body /deep/ pre {
+        padding: 1em;
+        background-color: #f7f7f7;
+        line-height: 1;
+      }
+      body code,
+      body /deep/ code {
+        font-family: "Source Code Pro", monospace;
+      }
+      .markdown-body blockquote,
+      body /deep/ .markdown-body blockquote,
+      {
+        margin: 0;
+        border-left: 4px solid #DDD;
+        padding: 0 15px;
+        color: #777;
+      }
+      .markdown-body blockquote:first-child,
+      body /deep/ .markdown-body blockquote>:first-child {
+        margin-top: 0px;
+      }
+      .markdown-body blockquote:last-child,
+      body /deep/ .markdown-body blockquote>:last-child {
+        margin-bottom: 0px;
+      }
+      .markdown-body table,
+      body /deep/ .markdown-body table {
+        width: 100%;
+        overflow: auto;
+        display: block;
+      }
+      .markdown-body table th,
+      body /deep/ .markdown-body table th {
+        font-weight: bold;
+      }
+      .markdown-body table th,
+      .markdown-body table td,
+      body /deep/ .markdown-body table th,
+      body /deep/ .markdown-body table td {
+        border: 1px solid #ddd;
+        padding: 6px 13px;
+      }
+      .markdown-body table tr,
+      body /deep/ .markdown-body table tr {
+        border-top: 1px solid #ccc;
+        background-color: #fff;
+      }
+      .markdown-body table tr:nth-child(2n),
+      body /deep/ .markdown-body table tr:nth-child(2n) {
+        background-color: #f7f7f7;
+      }
+      .markdown-body code,
+      .markdown-body pre,
+      body /deep/ .markdown-body code,
+      body /deep/ .markdown-body pre {
+        font-family: "Source Code Pro", Consolas, Menlo, Courier, monospace;
+        font-size: 16px;
+      }
+      .markdown-body pre,
+      body /deep/ .markdown-body pre {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      .markdown-body>*:first-child,
+      body /deep/ .markdown-body>*:first-child {
+        margin-top: 0 !important;
+      }
+      .markdown-body>*:last-child,
+      body /deep/ .markdown-body>*:last-child {
+        margin-bottom: 0 !important;
+      }
+      .markdown-body .highlight,
+      body /deep/ .markdown-body .highlight {
+        background: #ffffff;
+      }
+      .markdown-body .highlight .c,
+      body /deep/ .markdown-body .highlight .c {
+        color: #999988;
+        font-style: italic;
+      }
+      .markdown-body .highlight .err,
+      body /deep/ .markdown-body .highlight .err {
+        color: #a61717;
+        background-color: #e3d2d2;
+      }
+      .markdown-body .highlight .k,
+      body /deep/ .markdown-body .highlight .k {
+        font-weight: bold;
+      }
+      .markdown-body .highlight .o,
+      body /deep/ .markdown-body .highlight .o {
+        font-weight: bold;
+      }
+      .markdown-body .highlight .cm,
+      body /deep/ .markdown-body .highlight .cm {
+        color: #999988;
+        font-style: italic;
+      }
+      .markdown-body .highlight .cp,
+      body /deep/ .markdown-body .highlight .cp {
+        color: #999999;
+        font-weight: bold;
+      }
+      .markdown-body .highlight .c1,
+      body /deep/ .markdown-body .highlight .c1 {
+        color: #999988;
+        font-style: italic;
+      }
+      .markdown-body .highlight .cs,
+      body /deep/ .markdown-body .highlight .cs {
+        color: #999999;
+        font-weight: bold;
+        font-style: italic;
+      }
+      .markdown-body .highlight .gd,
+      body /deep/ .markdown-body .highlight .gd {
+        color: #000000;
+        background-color: #ffdddd;
+      }
+      .markdown-body .highlight .gd .x,
+      body /deep/ .markdown-body .highlight .gd .x {
+        color: #000000;
+        background-color: #ffaaaa;
+      }
+      .markdown-body .highlight .ge,
+      body /deep/ .markdown-body .highlight .ge {
+        font-style: italic;
+      }
+      .markdown-body .highlight .gr,
+      body /deep/ .markdown-body .highlight .gr {
+        color: #aa0000;
+      }
+      .markdown-body .highlight .gh,
+      body /deep/ .markdown-body .highlight .gh {
+        color: #999999;
+      }
+      .markdown-body .highlight .gi,
+      body /deep/ .markdown-body .highlight .gi {
+        color: #000000;
+        background-color: #ddffdd;
+      }
+      .highlight .gi .x,
+      body /deep/ .markdown-body .highlight .gi .x {
+        color: #000000;
+        background-color: #aaffaa;
+      }
+      .markdown-body .highlight .go,
+      body /deep/ .markdown-body .highlight .go {
+        color: #888888;
+      }
+      .markdown-body .highlight .gp,
+      body /deep/ .markdown-body .highlight .gp {
+        color: #555555;
+      }
+      .markdown-body .highlight .gs,
+      body /deep/ .markdown-body .highlight .gs {
+        font-weight: bold;
+      }
+      .markdown-body .highlight .gu,
+      body /deep/ .markdown-body .highlight .gu {
+        color: #800080;
+        font-weight: bold;
+      }
+      .markdown-body .highlight .gt,
+      body /deep/ .markdown-body .highlight .gt {
+        color: #aa0000;
+      }
+      .markdown-body .highlight .kc,
+      body /deep/ .markdown-body .highlight .kc {
+        font-weight: bold;
+      }
+      .markdown-body .highlight .kd,
+      body /deep/ .markdown-body .highlight .kd {
+        font-weight: bold;
+      }
+      .markdown-body .highlight .kn,
+      body /deep/ .markdown-body .highlight .kn {
+        font-weight: bold;
+      }
+      .markdown-body .highlight .kp,
+      body /deep/ .markdown-body .highlight .kp {
+        font-weight: bold;
+      }
+      .markdown-body .highlight .kr,
+      body /deep/ .markdown-body .highlight .kr {
+        font-weight: bold;
+      }
+      .markdown-body .highlight .kt,
+      body /deep/ .markdown-body .highlight .kt {
+        color: #445588;
+        font-weight: bold;
+      }
+      .markdown-body .highlight .m,
+      body /deep/ .markdown-body .highlight .m {
+        color: #009999;
+      }
+      .markdown-body .highlight .s,
+      body /deep/ .markdown-body .highlight .s {
+        color: #dd1144;
+      }
+      .markdown-body .highlight .n,
+      body /deep/ .markdown-body .highlight .n {
+        color: #333333;
+      }
+      .markdown-body .highlight .na,
+      body /deep/ .markdown-body .highlight .na {
+        color: teal;
+      }
+      .markdown-body .highlight .nb,
+      body /deep/ .markdown-body .highlight .nb {
+        color: #0086b3;
+      }
+      .markdown-body .highlight .nc,
+      body /deep/ .markdown-body .highlight .nc {
+        color: #445588;
+        font-weight: bold;
+      }
+      .markdown-body .highlight .no,
+      body /deep/ .markdown-body .highlight .no {
+        color: teal;
+      }
+      .markdown-body .highlight .ni,
+      body /deep/ .markdown-body .highlight .ni {
+        color: purple;
+      }
+      .markdown-body .highlight .ne,
+      body /deep/ .markdown-body .highlight .ne {
+        color: #990000;
+        font-weight: bold;
+      }
+      .markdown-body .highlight .nf,
+      body /deep/ .markdown-body .highlight .nf {
+        color: #990000;
+        font-weight: bold;
+      }
+      .markdown-body .highlight .nn,
+      body /deep/ .markdown-body .highlight .nn {
+        color: #555555;
+      }
+      .markdown-body .highlight .nt,
+      body /deep/ .markdown-body .highlight .nt {
+        color: navy;
+      }
+      .markdown-body .highlight .nv,
+      body /deep/ .markdown-body .highlight .nv {
+        color: teal;
+      }
+      .markdown-body .highlight .ow,
+      body /deep/ .markdown-body .highlight .ow {
+        font-weight: bold;
+      }
+      .markdown-body .highlight .w,
+      body /deep/ .markdown-body .highlight .w {
+        color: #bbbbbb;
+      }
+      .markdown-body .highlight .mf,
+      body /deep/ .markdown-body .highlight .mf {
+        color: #009999;
+      }
+      .markdown-body .highlight .mh,
+      body /deep/ .markdown-body .highlight .mh {
+        color: #009999;
+      }
+      .markdown-body .highlight .mi,
+      body /deep/ .markdown-body .highlight .mi {
+        color: #009999;
+      }
+      .markdown-body .highlight .mo,
+      body /deep/ .markdown-body .highlight .mo {
+        color: #009999;
+      }
+      .markdown-body .highlight .sb,
+      body /deep/ .markdown-body .highlight .sb {
+        color: #dd1144;
+      }
+      .markdown-body .highlight .sc,
+      body /deep/ .markdown-body .highlight .sc {
+        color: #dd1144;
+      }
+      .markdown-body .highlight .sd,
+      body /deep/ .markdown-body .highlight .sd {
+        color: #dd1144;
+      }
+      .markdown-body .highlight .s2,
+      body /deep/ .markdown-body .highlight .s2 {
+        color: #dd1144;
+      }
+      .markdown-body .highlight .se,
+      body /deep/ .markdown-body .highlight .se {
+        color: #dd1144;
+      }
+      .markdown-body .highlight .sh,
+      body /deep/ .markdown-body .highlight .sh {
+        color: #dd1144;
+      }
+      .markdown-body .highlight .si,
+      body /deep/ .markdown-body .highlight .si {
+        color: #dd1144;
+      }
+      .markdown-body .highlight .sx,
+      body /deep/ .markdown-body .highlight .sx {
+        color: #dd1144;
+      }
+      .markdown-body .highlight .sr,
+      body /deep/ .markdown-body .highlight .sr {
+        color: #009926;
+      }
+      .markdown-body .highlight .s1,
+      body /deep/ .markdown-body .highlight .s1 {
+        color: #dd1144;
+      }
+      .markdown-body .highlight .ss,
+      body /deep/ .markdown-body .highlight .ss {
+        color: #990073;
+      }
+      .markdown-body .highlight .bp,
+      body /deep/ .markdown-body .highlight .bp {
+        color: #999999;
+      }
+      .markdown-body .highlight .vc,
+      body /deep/ .markdown-body .highlight .vc {
+        color: teal;
+      }
+      .markdown-body .highlight .vg,
+      body /deep/ .markdown-body .highlight .vg {
+        color: teal;
+      }
+      .markdown-body .highlight .vi,
+      body /deep/ .markdown-body .highlight .vi {
+        color: teal;
+      }
+      .markdown-body .highlight .il,
+      body /deep/ .markdown-body .highlight .il {
+        color: #009999;
+      }
+      .markdown-body .highlight .gc,
+      body /deep/ .markdown-body .highlight .gc {
+        color: #999;
+        background-color: #EAF2F5;
+      }
+    </style>
+    <core-ajax auto url="{{url}}" handleAs="text" response="{{doc}}"></core-ajax>
+    <!--
+    <re-markable text="{{doc}}"></re-markable>
+    <marked-element text="{{doc}}"></marked-element>
+-->
+    <juicy-markdown value="{{doc}}"></juicy-markdown>
+
+  </template>
+</polymer-element>

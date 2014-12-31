@@ -1,0 +1,35 @@
+{
+  "name": "athena-document",
+  "version": "0.0.2",
+  "authors": [
+    "Carlos Araya (carlos.araya@gmail.com)"
+  ],
+  "description": "Opinionated wrapper around marked-element component",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "marked",
+    "markdown"
+  ],
+  "main": "athena-document.html",
+  "license": "MIT",
+  "homepage": "https://github.com/caraya/athena-document.html",
+  "ignore": [
+    "/.*",
+    "/tests/"
+  ],
+  "dependencies": {
+    "font-roboto": "polymer/font-roboto#~0.5.1",
+    "polymer": "~0.5.1",
+    "core-ajax": "polymer/core-ajax#~0.5.1"
+  },
+  "devDependencies": {
+    "web-component-tester": "Polymer/web-component-tester#^2.0.0-rc1"
+  },
+  "resolutions": {
+    "polymer": "~0.5.1",
+    "core-component-page": "^0.5.0",
+    "github-markdown-css": "~0.2.0"
+  }
+}

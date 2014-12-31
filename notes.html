@@ -1,0 +1,475 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>no-router</title>
+    <script src="/bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="stylesheet" href="/css/styles.css" shim-shadowdom>
+    <link rel="import" href="/bower_components/polymer/polymer.html">
+    <link rel="import" href="/layouts/sidebar-layout.html">
+    <link rel="stylesheet" href="/css/content.css">
+  </head>
+  <body unresolved>
+    <sidebar-layout selected="notes">
+      <div class="title">Athena Concept Doc</div>
+          <article class="markdown-body entry-content" itemprop="mainContentOfPage"><h1>
+<a id="user-content-athena-what-an-ofline-web-reading-experience-may-look-like" class="anchor" href="#athena-what-an-ofline-web-reading-experience-may-look-like" aria-hidden="true"><span class="octicon octicon-link"></span></a>Athena: What an ofline web reading experience may look like</h1>
+
+<p>With the latest set of web technologies coming down the W3C/WHATWG pipeline it is now possible to create top-of-the-line responsive experiences that can also work as ofline applications. </p>
+
+<p>HTML5 web is more than capable of competing with native applications. Chrome and Windows apps have shown as much capability as native apps, if we let them. What needs to happen now is the developer shift to thinking about the web in terms of application logic rather than the rules we want the web to play by.</p>
+
+<p>Athena is a proof of concept for such an application. It uses <a href="https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md">ServiceWorkers</a> for caching application resources, it uses <a href="https://www.polymer-project.org/">Polymer</a> and a suite of custom <a href="http://webcomponents.org/">web components</a> to handle layout and application structures.</p>
+
+<p>This article discusses the rationale for Athena and how it has been implemented. It represents my ideas and opinions but it is not prescriptive; rather it embraces the Perl moto: <strong>There's more than one way to do it (TMTOWTD)</strong>. The only <strong>required</strong> part of an Athena publication is the service worker... the UI and content display is up to you.</p>
+
+<h2>
+<a id="user-content-browser-support-considerations" class="anchor" href="#browser-support-considerations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Browser support considerations</h2>
+
+<p>Whatever way we choose to creatae and show the content must:</p>
+
+<ul class="task-list">
+<li>The solution must support current versions of IE, Opera, Firefox and Chrome. It should also work with the 2 prior versions of each browser</li>
+<li>Must provide keyboard and touch alternatives for mouse navigation</li>
+<li>If the content scrolls beyond the visible area on screen there mush be an icon, or another indicator, to show the text overset (maybe something like what Adobe InDesign does with overset text frames)</li>
+</ul>
+
+<p>The work dones at W3C, WHATWG and ECMA TC-39 coupled with browser vendor's adoption have made the browser a better development environment. Libraries like jQuery were initially created to speed css interactions and to smooth the differences in CSS rendering and Javascript support among browsers. Because of this standardization and the requirements we set up above we can drop older version of browsers to concentrate in our application, not the workarounds.  </p>
+
+<p>This flies in the face of people telling you that we should go back as far as possible in supporting users. Not all computers can upgrade browsers or even operating systems. In most instances I would agree but if we are trying to push the envelope then we should use the best available technology without consideration for older versions that limit functionality (I'm looking at you Internet Explorer 8)</p>
+
+<p>Athena's technology stack also makes it hard to polyfill for older browsers. ShadowDOM and ServiceWorkers have limited (or non existant) polyfill support and that makes them work only with modern, evergreen browsers. </p>
+
+<p>The reference implementation uses the following technologies, listed with the browser support information for each</p>
+
+<table>
+<thead>
+<tr>
+<th>Technology</th>
+<th>Support information</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Polymer</td>
+<td><a href="https://www.polymer-project.org/resources/compatibility.html">Polymer browser support</a></td>
+</tr>
+<tr>
+<td>ServiceWorker</td>
+<td><a href="https://jakearchibald.github.io/isserviceworkerready/">Is ServiceWorker Ready?</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>Other technologies have a different support requirements that are outside the scope of this article.</p>
+
+<h2>
+<a id="user-content-remember-you-get-what-you-paid-for" class="anchor" href="#remember-you-get-what-you-paid-for" aria-hidden="true"><span class="octicon octicon-link"></span></a>Remember: You get what you paid for</h2>
+
+<p>Because the specifications used in this project (web component specifications and ServiceWorkers) are not finalized, developers can (and should) expect changes... that's the price we pay for working with the newest stuff. But it allso allows us to tighten the feedback loop to the spec writers, tell them what works, what doesn't work and what we'd like to see going forward.</p>
+
+<p>The <a href="https://extensiblewebmanifesto.org/">extensible web manifesto</a> speaks more of this way spec writers and application developers should interact with each other.</p>
+
+<h2>
+<a id="user-content-inspiration" class="anchor" href="#inspiration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Inspiration</h2>
+
+<p><a href="http://craigmod.com/bibliotype/">Bibliotype</a> and <a href="http://alistapart.com/article/a-simpler-page">and a related article</a> with code available <a href="https://github.com/cmod/bibliotype">in Github</a></p>
+
+<p>Webstock '13: <a href="http://vimeo.com/62462856">Craig Mod - Subcompact Publishing</a>.</p>
+
+<p><a href="https://hi.co">Hi</a> combines elements of twitter and the open web. When you first start you are required to enter a 20 word snippet of text and to allow the site to capture your location (it adds weather data to the location for some random reason.) This is called a moment.</p>
+
+<p>You are then allowed to create longer form content related to the moment you initially created. Other users in the application can ask you to do expand on the moment; whether you do so or not is your decision.</p>
+
+<p><a href="https://flipboard.com/">Flipboard</a> is a windows and mobile application that collects, curates and delivers long(er) form content.</p>
+
+<p>In <a href="http://www.ted.com/talks/mike_matas">A next-generation digital book</a> Mike Matas presents ideas and concepts for a digital book or book-like application. These are fully interactive books that take advantage of multimedia and advanced mobile device features to make reading a more engaging experience. None of the things shown in the video is impossible using web technologies, why haven't we done so already?</p>
+
+<p><a href="http://sarahgp.com/">Sarah Groff-Palermo</a> cares a lot about putting data art on the web. Books should be as much as art as technological endeavors. Her ForwardJS <a href="https://www.youtube.com/watch?v=ICIbBniojj4">presentation</a> mixes art and code in one interesting product. </p>
+
+<p><a href="http://craigmod.com/">Craig Mod's</a> essays:</p>
+
+<ul class="task-list">
+<li><a href="http://craigmod.com/journal/ipad_and_books/">Books in the age of the iPad</a></li>
+<li><a href="http://craigmod.com/journal/ebooks/">Embracing the digital book</a></li>
+<li><a href="http://craigmod.com/sputnik/collaborative_book/">The collaborative book</a></li>
+<li><a href="http://craigmod.com/sputnik/a_simpler_page/">A Simpler Page</a></li>
+<li><a href="http://craigmod.com/journal/post_artifact/">Post-Artifact Books and Publishing</a></li>
+<li><a href="http://craigmod.com/sputnik/our_future_book/">The shape of our future book</a></li>
+<li><a href="http://craigmod.com/journal/platforming_books/">Platforming books</a></li>
+<li><a href="http://craigmod.com/journal/subcompact_publishing/">Subcompact Publishing</a></li>
+<li><a href="http://craigmod.com/sputnik/hi/">Hi: Narrative Mapping the World</a></li>
+</ul>
+
+<h1>
+<a id="user-content-hosting-technology-and-components" class="anchor" href="#hosting-technology-and-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Hosting, technology and components</h1>
+
+<p>What are the parts of Athena? What are they used for?</p>
+
+<h2>
+<a id="user-content-hosted-on-github" class="anchor" href="#hosted-on-github" aria-hidden="true"><span class="octicon octicon-link"></span></a>Hosted on Github</h2>
+
+<p>Athena publications are initially hosted on <a href="https://pages.github.com/">Github Pages</a> for the following reasons:</p>
+
+<ul class="task-list">
+<li>Whenever you create a gh-pages website you automatically get SSL. Serviceworkers will only install and work on SSL enabled websites</li>
+<li>Because the website is just another branch of the repository we can set it up so that edits are pushed directly to the production publication</li>
+<li>You can still assign your own domain name to the website or choose to keep the github.io domain name</li>
+<li>The basic Github functionality is free for public repositories. If you want private repositories then there's a <a href="https://github.com/pricing">cost</a>
+</li>
+</ul>
+
+<h2>
+<a id="user-content-service-worker" class="anchor" href="#service-worker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Service Worker</h2>
+
+<p><a href="https://www.youtube.com/watch?v=Rr2vXDIVerI"><img src="https://camo.githubusercontent.com/cfc595519a5a2caee0f1f46f422859f1193b3d5c/687474703a2f2f696d672e796f75747562652e636f6d2f76692f52723276584449566572492f302e6a7067" alt="ServiceWorker is coming, look busy" data-canonical-src="http://img.youtube.com/vi/Rr2vXDIVerI/0.jpg" style="max-width:100%;"></a></p>
+
+<p>The core of an Athena publication is a scoped service worker that will initially handle the caching of the publication's content. We take advantage of the multiple cache capabilitity available with service workers to create caches for individual unitts of content (like magazine issues) and to expire them within a certain time period (by removing and deleting the cache).</p>
+
+<p>For publications needing to pull data from specific URLs we can special case the requests based on different pieces of the URL allowing to create different caches based on edition (assuming each edition is stored in its own directory) or resource type.</p>
+
+<p>Serviceworkers have another benefit not directly related with offline connections. They will give all access to our content a speed boost by eliminating the network roundtrip. If the content is in the cache, the speed is only limited by the Hard Drive's speed to see how long it takes to retrieve the content from the cache.</p>
+
+<p>This is what the serviceworker code may look like:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// This is one best practice that can be followed in general to keep track of</span>
+<span class="pl-c">// multiple caches used by a given service worker, and keep them all versioned.</span>
+<span class="pl-c">// It maps a shorthand identifier for a cache to a specific,</span>
+<span class="pl-c">// versioned cache name.</span>
+
+<span class="pl-c">// Note that since global state is discarded in between service worker restarts,</span>
+<span class="pl-c">// these variables will be reinitialized each time the service worker handles an</span>
+<span class="pl-c">// event, and you should not attempt to change their values inside an event</span>
+<span class="pl-c">// handler. (Treat them as constants.)</span>
+
+<span class="pl-c">// If at any point you want to force pages that use this service worker to</span>
+<span class="pl-c">// start using a fresh cache, then increment the CACHE_VERSION value. It will</span>
+<span class="pl-c">// kick off the service worker update flow and the old cache(s) will be purged</span>
+<span class="pl-c">// as part of the activate event handler when the updated service worker is</span>
+<span class="pl-c">// activated.</span>
+<span class="pl-s">var</span> CONTENT_CACHE_VERSION <span class="pl-k">=</span> <span class="pl-c1">1</span>;
+<span class="pl-s">var</span> CURRENT_CACHES <span class="pl-k">=</span> {
+  <span class="pl-s1"><span class="pl-pds">'</span>content<span class="pl-pds">'</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>athena-concent-v<span class="pl-pds">'</span></span> <span class="pl-k">+</span> CONTENT_CACHE_VERSION
+  <span class="pl-c">// We can also create caches for each individual chapter or</span>
+  <span class="pl-c">// unit of content.</span>
+  <span class="pl-c">// We can also cache images and media separately and expire them</span>
+  <span class="pl-c">// in a different schedule</span>
+};
+
+self.addEventListener(<span class="pl-s1"><span class="pl-pds">'</span>activate<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">event</span>) {
+<span class="pl-c">// Delete all caches that aren't named in CURRENT_CACHES.</span>
+<span class="pl-c">// While there is only one cache in this example, the same logic will</span>
+<span class="pl-c">// handle the case where there are multiple versioned caches.</span>
+<span class="pl-s">var</span> urlsToPrefetch <span class="pl-k">=</span> [
+    <span class="pl-s1"><span class="pl-pds">'</span>./content/pre_fetched.txt<span class="pl-pds">'</span></span>,
+    <span class="pl-s1"><span class="pl-pds">'</span>./content/pre_fetched.html<span class="pl-pds">'</span></span>,
+    <span class="pl-c">// We can also fetch remote content for our cache(s)</span>
+    <span class="pl-s1"><span class="pl-pds">'</span>https://www.chromium.org/_/rsrc/1302286216006/config/customLogo.gif<span class="pl-pds">'</span></span>
+  ];
+
+  <span class="pl-c">// All of these logging statements should be visible via the "Inspect"</span>
+  <span class="pl-c">// interface for the relevant SW accessed via chrome://serviceworker-internals</span>
+  <span class="pl-en">console</span><span class="pl-s3">.log</span>(<span class="pl-s1"><span class="pl-pds">'</span>Handling install event. Resources to pre-fetch:<span class="pl-pds">'</span></span>, urlsToPrefetch);
+  <span class="pl-s">var</span> expectedCacheNames <span class="pl-k">=</span> <span class="pl-s3">Object</span>.keys(CURRENT_CACHES).map(<span class="pl-st">function</span>(<span class="pl-vpf">key</span>) {
+    <span class="pl-k">return</span> CURRENT_CACHES[key];
+  });
+
+  <span class="pl-s3">event</span>.waitUntil(
+  caches.keys().then(<span class="pl-st">function</span>(<span class="pl-vpf">cacheNames</span>) {
+      <span class="pl-k">return</span> Promise.<span class="pl-sc">all</span>(
+        cacheNames.map(<span class="pl-st">function</span>(<span class="pl-vpf">cacheName</span>) {
+          <span class="pl-k">if</span> (expectedCacheNames.<span class="pl-s3">indexOf</span>(cacheName) <span class="pl-k">==</span> <span class="pl-k">-</span><span class="pl-c1">1</span>) {
+            <span class="pl-c">// If this cache name isn't present in the array of "expected"</span>
+            <span class="pl-c">// cache names, then delete it.</span>
+            <span class="pl-en">console</span><span class="pl-s3">.log</span>(<span class="pl-s1"><span class="pl-pds">'</span>Deleting out of date cache:<span class="pl-pds">'</span></span>, cacheName);
+            <span class="pl-k">return</span> caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+    caches.<span class="pl-s3">open</span>(CURRENT_CACHES[<span class="pl-s1"><span class="pl-pds">'</span>prefetch<span class="pl-pds">'</span></span>]).then(<span class="pl-st">function</span> (<span class="pl-vpf">cache</span>) {
+      cache.addAll(urlsToPrefetch.map(<span class="pl-st">function</span> (<span class="pl-vpf">urlToPrefetch</span>) {
+        <span class="pl-c">// It's very important to use {mode: 'no-cors'} if there is any</span>
+        <span class="pl-c">// chance that the resources being fetched are served off of a server</span>
+        <span class="pl-c">// that doesn't support CORS</span>
+        <span class="pl-c">// (http://en.wikipedia.org/wiki/Cross-origin_resource_sharing).</span>
+
+        <span class="pl-c">// In this example, www.chromium.org doesn't support CORS, and the</span>
+        <span class="pl-c">// fetch() would fail if the default mode of 'cors' was used for the</span>
+        <span class="pl-c">// fetch() request. The drawback of hardcoding {mode: 'no-cors'} is that</span>
+        <span class="pl-c">// the response from all cross-origin hosts will always be opaque</span>
+        <span class="pl-c">// (https://slightlyoff.github.io/ServiceWorker/spec/service_worker/</span>
+        <span class="pl-c">// index.html#cross-origin-resources)</span>
+        <span class="pl-c">// and it is not possible to determine whether an opaque response</span>
+        <span class="pl-c">// represents a success or failure</span>
+        <span class="pl-c">// (https://github.com/whatwg/fetch/issues/14).</span>
+        <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-en">Request</span>(urlToPrefetch, {
+          mode<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>no-cors<span class="pl-pds">'</span></span>
+        });
+      })).then(<span class="pl-st">function</span> () {
+        <span class="pl-en">console</span><span class="pl-s3">.log</span>(<span class="pl-s1"><span class="pl-pds">'</span>All resources have been fetched and cached.<span class="pl-pds">'</span></span>);
+      });
+    }).catch(<span class="pl-st">function</span> (<span class="pl-vpf">error</span>) {
+      <span class="pl-c">// This catch() will handle any exceptions from the</span>
+      <span class="pl-c">// caches.open()/cache.addAll() steps.</span>
+      <span class="pl-en">console</span><span class="pl-s3">.error</span>(<span class="pl-s1"><span class="pl-pds">'</span>Pre-fetching failed:<span class="pl-pds">'</span></span>, error);
+      }));
+    });
+
+    <span class="pl-v">this</span>.addEventListener(<span class="pl-s1"><span class="pl-pds">'</span>fetch<span class="pl-pds">'</span></span>, <span class="pl-st">function</span> (<span class="pl-vpf">event</span>) {
+      <span class="pl-s">var</span> requestURL <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">URL</span>(<span class="pl-s3">event</span>.request.url);
+
+      <span class="pl-s3">event</span>.respondWith(
+        caches.<span class="pl-s3">match</span>(<span class="pl-s3">event</span>.request)
+          .then(<span class="pl-st">function</span> (<span class="pl-vpf">response</span>) {
+            <span class="pl-k">return</span> response <span class="pl-k">||</span> fetch(<span class="pl-s3">event</span>.request);
+          })
+          .catch(<span class="pl-st">function</span> (<span class="pl-vpf">error</span>) {
+            <span class="pl-c">// This catch() will handle exceptions that arise from the match() or</span>
+            <span class="pl-c">// fetch() operations. Note that a HTTP error response (e.g. 404)</span>
+            <span class="pl-c">// will NOT trigger an exception. It will return a normal response</span>
+            <span class="pl-c">// object that has the appropriate error code set.</span>
+            <span class="pl-en">console</span><span class="pl-s3">.error</span>(<span class="pl-s1"><span class="pl-pds">'</span>  Error in fetch handler:<span class="pl-pds">'</span></span>, error);
+            <span class="pl-k">throw</span> error;
+        });
+      )
+    });
+  });
+  );
+});
+</pre></div>
+
+<h3>
+<a id="user-content-limitations" class="anchor" href="#limitations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Limitations</h3>
+
+<p>As powerful as service workers are they also have some drawbacks. They can only be served through HTTPS (you cannot install a service worker in a non secure server) to prevent <a href="http://www.wikiwand.com/en/Man-in-the-middle_attack">man-in-the-middle attacks</a>.</p>
+
+<p>There is limited support for the API (only Chrome Canary and Beta and Firefox Nightly builds will work.) This will change as the API matures and becomes finalized in the WHATWG and/or a recommendation with the W3C. </p>
+
+<p>Even in browsers that support the API the support is not complete. Chrome uses a polyfill for elements of the cache API that it does not support natively. This should be fixed in upcoming versions of Chrome and Chromium (the open source project Chrome is based on.)</p>
+
+<p>We need to be careful with how much data we choose to store in the caches. From what I understand the ammount of storage given to offline applications is divided between all offline storage types: IndexedDB, Session Storage, Web Workers and Service Workers and this amount is not consistent across all browsers. Furthermore I am not aware of any way to increase this total amount or to specifically increase the storage assigned to serviceworkers.</p>
+
+<h3>
+<a id="user-content-the-future" class="anchor" href="#the-future" aria-hidden="true"><span class="octicon octicon-link"></span></a>The future</h3>
+
+<p>As part of the serviceworker family of specifications we will be able to match native applications with <a href="https://w3c.github.io/push-api/index.html">push notification</a> and <a href="https://github.com/slightlyoff/BackgroundSync/blob/master/explainer.md">background content synchronization</a> using open web APIs.</p>
+
+<h2>
+<a id="user-content-json-package-file" class="anchor" href="#json-package-file" aria-hidden="true"><span class="octicon octicon-link"></span></a>JSON package file</h2>
+
+<p>Taking a cue from the <code>package.opf</code> epub package specification I've come up with a basic JSON definition for a publication package. We picked JSON as our package format because it is easier to write, easier to validate (using tools like <a href="http://jsonlint.com/">jsonlint</a>) and can easily be parsed by all existing browsers (<a href="http://caniuse.com/#search=json">according to caniuse.com</a>).</p>
+
+<p>The other advantage is that we can easily customize our package file to match the needs of our specific publications. </p>
+
+<p>The basic publication.json may look something like this</p>
+
+<div class="highlight highlight-json"><pre>{
+  <span class="pl-s1"><span class="pl-pds">"</span>publicaton<span class="pl-pds">"</span></span>: {
+    <span class="pl-s1"><span class="pl-pds">"</span>metadata<span class="pl-pds">"</span></span>: {
+      <span class="pl-s1"><span class="pl-pds">"</span>pub-type<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>,
+      <span class="pl-s1"><span class="pl-pds">"</span>Title<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>New Adventures of Old Sherlock Holmes<span class="pl-pds">"</span></span>,
+      <span class="pl-s1"><span class="pl-pds">"</span>pub-info<span class="pl-pds">"</span></span>: [
+        {
+        <span class="pl-s1"><span class="pl-pds">"</span>pub-date<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>20141130<span class="pl-pds">"</span></span>,
+        <span class="pl-s1"><span class="pl-pds">"</span>pub-location<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>London<span class="pl-pds">"</span></span>,
+        <span class="pl-s1"><span class="pl-pds">"</span>publisher<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>That Press, Ltd<span class="pl-pds">"</span></span>
+        }
+      ],
+      <span class="pl-s1"><span class="pl-pds">"</span>authors<span class="pl-pds">"</span></span>: [
+        {
+          <span class="pl-s1"><span class="pl-pds">"</span>firstName<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>Sherlock<span class="pl-pds">"</span></span>,
+          <span class="pl-s1"><span class="pl-pds">"</span>lastName<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>Holmes<span class="pl-pds">"</span></span>
+        }
+      ],
+      <span class="pl-s1"><span class="pl-pds">"</span>editors<span class="pl-pds">"</span></span>: [
+          {
+            <span class="pl-s1"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>Production Editor<span class="pl-pds">"</span></span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>firstName<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>John<span class="pl-pds">"</span></span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>lastName<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>Watson<span class="pl-pds">"</span></span>
+        }
+      ]
+    },
+    <span class="pl-s1"><span class="pl-pds">"</span>structure<span class="pl-pds">"</span></span>: {
+      <span class="pl-s1"><span class="pl-pds">"</span>content<span class="pl-pds">"</span></span>: [
+        {
+          <span class="pl-s1"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>Introduction<span class="pl-pds">"</span></span>,
+          <span class="pl-s1"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>Introduction<span class="pl-pds">"</span></span>,
+          <span class="pl-s1"><span class="pl-pds">"</span>location<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>content/introduction.html<span class="pl-pds">"</span></span>
+        },
+        {
+          <span class="pl-s1"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>Chapter 1<span class="pl-pds">"</span></span>,
+          <span class="pl-s1"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>chapter<span class="pl-pds">"</span></span>,
+          <span class="pl-s1"><span class="pl-pds">"</span>location<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>content/chapter1.html<span class="pl-pds">"</span></span>
+        },
+        {
+          <span class="pl-s1"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>Chapter 2<span class="pl-pds">"</span></span>,
+          <span class="pl-s1"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>chapter<span class="pl-pds">"</span></span>,
+          <span class="pl-s1"><span class="pl-pds">"</span>location<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>content/chapter2.html<span class="pl-pds">"</span></span>
+        }
+      ]
+    }
+  }
+}</pre></div>
+
+<p>I've left the format deliberately vague because I believe this needs many iterations to become the strong format that it needs to be.</p>
+
+<h2>
+<a id="user-content-ui" class="anchor" href="#ui" aria-hidden="true"><span class="octicon octicon-link"></span></a>UI</h2>
+
+<p>The UI is one of the points where I'm struggling. Athena herself doesn't (meaning I don't) really care about what front end platform/Library/flavor of the week you choose for the User Interface. I've chosen three experimental interfaces for introducing Athena: <a href="https://www.polymer-project.org/">Polymer</a>, <a href="https://angularjs.org/">Angular</a> and a plain HTML interface using <a href="http://getbootstrap.com/">Bootstrap</a> (or maybe <a href="http://foundation.zurb.com/">Foundation</a>) </p>
+
+<blockquote>
+<p>One big problem that I need to research is the routing portion of web application and whether I can route external pages through the framework and control where the content is displayed.
+Another option would be to use some aspects of Polymer and mix them with a plain Bootstrap or Foundation site and eschew the web application side.
+It's too early in the process to decide.</p>
+</blockquote>
+
+<p>The <a href="http://caraya.github.io/athena-framework/">Polymer</a> version provides a glimpse of how a Polymer-based application may look like. It also uses <a href="https://github.com/caraya/athena-document/">athena-document</a>, a custom element that wraps a markdown transformation engine for display on the web. There shouldn't be major problems to do the same thing with LaTeX and other document formats and there's nothing that says we can't use these web components in non Polymer applications.</p>
+
+<h2>
+<a id="user-content-content-format-and-metaphors" class="anchor" href="#content-format-and-metaphors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Content: format and metaphors</h2>
+
+<p>In my blog I've written about <a href="http://wp.me/p3KUjB-1f0c">Paged Media and Generated Content for paged media</a> and about creating a <a href="http://wp.me/p3KUjB-1vkb">print @media style sheet</a>. They both refer to printed content, either by creating PDF directly (using Paged media) or adapting the web content for printing (using @media rules tailored for print).</p>
+
+<p>Athena doesn't want to be a print platform but a starting point to test whether offline web apps can compete with native platforms and existing digital content standards. That said it should be possible to create paged media style sheets to at least create a good PDF for print and a high quality version for archival storage. </p>
+
+<p>See <a href="#book-metaphors-online">Book Metaphors Online</a> for a more thorough discussion on this subject.</p>
+
+<h3>
+<a id="user-content-format" class="anchor" href="#format" aria-hidden="true"><span class="octicon octicon-link"></span></a>Format</h3>
+
+<p>I've <a href="http://publishing-project.rivendellweb.net/html-is-the-final-product-not-the-initial-source/">written before</a> about HTML and its roles as the final language for publication. I will only summarize the article I just linked. </p>
+
+<p>HTML is a powerful language full of capabilities and, alongside CSS3 and Javascript, provides the foundation of modern sites and applications. </p>
+
+<p>HTML is not an easy language to author. Depending on the variant of HTML you're writing (XHTML or regular HTML) you have to follow different rules. </p>
+
+<p>The default HTML5 is too permissive; it allows the worst <a href="http://www.wikiwand.com/en/Tag_soup">tag soup</a> markup; the same markup that has been allowed by browser vendors in an effort to be competitive. It is nice to authors but makes parsing the content much harder than it needs to be. </p>
+
+<p>XHTML5 syntax (best explained in this <a href="http://html5doctor.com/html-5-xml-xhtml-5/">HTML5 Doctor</a> article by Bruce Lawson) provides stricter guidelines for authors that may turn some people off from HTML altogether. Sure, attributes must be quotes, all tags must be lowercase and all attributes must be closed, including &lt;img&gt; and &lt;br&gt; tags. The benefit is that the stricter rules make parsing content and developing new technologies around it easier.</p>
+
+<p>Because of these difficulties I present 4 solutions to create content that easily transforms to XHTML5 content. I don't go into too much detail of each solution, just enough to give you an idea of what it is.</p>
+
+<ul class="task-list">
+<li>
+<a href="http://daringfireball.net/projects/markdown/">Markdown</a> is a text to (X)HTML conversion tool designed for writers. It refers both to the syntax used in the Markdown text files and the applications used to perform the conversion</li>
+<li>
+<a href="http://www.methods.co.nz/asciidoc/">AsciiDoc</a> is a text document format for writing notes, documentation, articles, books, ebooks, slideshows, web pages, man pages and blogs. AsciiDoc files can be translated to many formats including HTML, PDF, EPUB, man page</li>
+<li>
+<a href="https://github.com/oreillymedia/HTMLBook">HTMLBook</a> is an open, XHTML5-based standard for the authoring and production of both print and digital books. It is currently under development</li>
+<li>
+<a href="http://docbook.org/">Docbook</a>, <a href="http://dita.xml.org/">DITA</a> and <a href="http://www.tei-c.org/index.xml">TEI</a> are some examples of XML vocabularies that can be converted to HTML.</li>
+</ul>
+
+<p><strong>Athena doesn't really care what you use to create your content as long as you provide well formed HTML5 created with XHTML5  syntax.</strong></p>
+
+<h3>
+<a id="user-content-book-metaphors-online" class="anchor" href="#book-metaphors-online" aria-hidden="true"><span class="octicon octicon-link"></span></a>Book metaphors online</h3>
+
+<p>Does it make sense for Athena to use book metaphors? </p>
+
+<p>Most of these metaphors use jQuery and jQuery plugins/addons </p>
+
+<p>For the simplest of book interfaces we can just use one of the scripts below to build a pagination setup that requires to click on either a page number or in an arrow.</p>
+
+<p>If the script doesn't incorporate it already, we can then build a keyboard navigation interface by creating a small script that matches key pressed to arrows and navigates forward or backward based on the arrows pressed.</p>
+
+<ul class="task-list">
+<li><a href="http://flaviusmatis.github.io/simplePagination.js/">http://flaviusmatis.github.io/simplePagination.js/</a></li>
+<li><a href="http://cssdeck.com/labs/quick-and-simple-pagination">http://cssdeck.com/labs/quick-and-simple-pagination</a></li>
+<li><a href="http://designshack.net/articles/css/building-a-custom-css3-pagination-user-interface/">http://designshack.net/articles/css/building-a-custom-css3-pagination-user-interface/</a></li>
+</ul>
+
+<h5>
+<a id="user-content-full-examples" class="anchor" href="#full-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Full examples</h5>
+
+<p>Turn.js and Bookblock present complete book-like interfaces. They use jQuery and, in the case of Bookblock, additional libraries that have to be cached and may present issues when working with Polymer and other web component libraries</p>
+
+<ul class="task-list">
+<li>
+<a href="http://www.turnjs.com/">turn.js</a> uses <a href="http://jquery.com/">jQuery</a>
+
+<ul class="task-list">
+<li><a href="http://www.turnjs.com/#samples/steve-jobs/10">turn.js example</a></li>
+<li><a href="http://www.turnjs.com/#samples/magazine1/1">turn.js example 2</a></li>
+</ul>
+</li>
+<li>Bookblock plugin is another example using <a href="http://jquery.com/">jQuery</a> and <a href="http://jquerypp.com/">jQuery++</a>
+
+<ul class="task-list">
+<li><a href="http://tympanus.net/codrops/2012/09/03/bookblock-a-content-flip-plugin/">bookblock plugin</a></li>
+<li><a href="http://tympanus.net/codrops/2012/12/11/fullscreen-pageflip-layout/">Layout demo</a></li>
+</ul>
+</li>
+</ul>
+
+<h1>
+<a id="user-content-use-cases-for-athena-publications" class="anchor" href="#use-cases-for-athena-publications" aria-hidden="true"><span class="octicon octicon-link"></span></a>Use cases for Athena publications</h1>
+
+<p>These are the three main uses cases I see for Athena publications. The first two are based on short publication looks. The third use case is based on what media and resources will serve the story best. Enhancing existing content lets us choose which part of the Athena toolkit we'll use with the content we're working on... at the very least convert the project into an offline capable application.</p>
+
+<h2>
+<a id="user-content-early-access-content" class="anchor" href="#early-access-content" aria-hidden="true"><span class="octicon octicon-link"></span></a>Early access content</h2>
+
+<p>The Early Access Publications idea is based in existing programs like Manning's MEAP and O'Reilly's Early release programs where the book content is published as soon as it's ready (and sometimes as soon as the author is done writing it.)</p>
+
+<p>We can do multimedia books (see below for more information about how I envision interactive books) and the multimedia work can be done in parallel to the writing or it can all be done in a collborative fashion (Github private repo or similar version control system.)</p>
+
+<p>The advantage of this kind of publication is that it tightens the feedback loop between readers, reviewers, editors and authors. It also allows for collaborative editing: whoever has access to the git repository can make changes and accept changes coming from the community (whether this repository is public or private.)</p>
+
+<p>O'Reilly Media uses Ilia Grigorik's book <em><a href="http://chimera.labs.oreilly.com/books/1230000000545">High Performance Browser Networking</a></em> as a case study on the benefits of this tighter loop. </p>
+
+<h2>
+<a id="user-content-serial-publications-magazines-and-the-like" class="anchor" href="#serial-publications-magazines-and-the-like" aria-hidden="true"><span class="octicon octicon-link"></span></a>Serial Publications (magazines and the like)</h2>
+
+<p>Serials are periodical publications. Magazines are the ones that come to mind fitst but they are not the only ones. Shorter content like <a href="https://atavist.com/">Atavist</a> books and stories or the longer content available from <a href="https://atlas.oreilly.com/">O'Reilly Atlas</a> with the added advantage of offline access.</p>
+
+<p>This way a book is never really done. We can continue to work on stories and tell new stories as long as we want to and the stories can get that continual polish that makes for a good reading experience. If we need/want to, we can also provide CSS Paged Media Stylesheets that will allow to create a PDF version of the text/images we make available. </p>
+
+<h2>
+<a id="user-content-interactive-books" class="anchor" href="#interactive-books" aria-hidden="true"><span class="octicon octicon-link"></span></a>Interactive books</h2>
+
+<p>When I was thinking about interactive books there were two that came to mind: The first one was the <a href="http://bit.ly/13Zfb3c">Defiance</a> companion iBook and Al Gore's <a href="http://bit.ly/13pgtnd">Our Choice</a> as presented at <a href="http://www.ted.com/talks/mike_matas">TED</a> in 2011. </p>
+
+<p>Before all the new CSS, HTML5 and Javascript technologies became mainstream it was very difficult (if not right out impossible) to create create experiences like the ones above. </p>
+
+<p>Now the almost impossible is merely diffcult. The technologies in those books is available as open web APIs at different levels of standardization and you can create equivalent experiences from the Applications that you run in your mobile devices. </p>
+
+<h2>
+<a id="user-content-enhancing-existing-content" class="anchor" href="#enhancing-existing-content" aria-hidden="true"><span class="octicon octicon-link"></span></a>Enhancing existing content</h2>
+
+<p>The easiest way to start using Athena is to add the offline ServiceWorker to an existing application. This process if fairly simple:</p>
+
+<ul class="task-list">
+<li>Create a ServiceWorker script that cached the required files</li>
+<li>Link the service worker to the main page in your application</li>
+<li>Test the offline experience and overall functionality of your project</li>
+</ul>
+
+<h1>
+<a id="user-content-copyright-considerations" class="anchor" href="#copyright-considerations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Copyright Considerations</h1>
+
+<p>When working with Athena content we have a fairly open hand as to what resources we fetch and the sources we fetch resources from. What copyright restrictions do we face when accessing and then caching content?</p>
+
+<p>There is nothing that would stop me from doing this when defining the cache content:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> urlsToPrefetch <span class="pl-k">=</span> [
+    <span class="pl-s1"><span class="pl-pds">'</span>./content/introduction.html<span class="pl-pds">'</span></span>,
+    <span class="pl-s1"><span class="pl-pds">'</span>./content/pre_fetched.html<span class="pl-pds">'</span></span>,
+    <span class="pl-c">// We can also fetch remote content for our cache(s)</span>
+    <span class="pl-s1"><span class="pl-pds">'</span>http://chimera.labs.oreilly.com/books/1230000000345/ch12.html<span class="pl-pds">'</span></span>,
+    <span class="pl-s1"><span class="pl-pds">'</span>http://chimera.labs.oreilly.com/books/1230000000345/apa.html<span class="pl-pds">'</span></span>
+];</pre></div>
+
+<p>In the links above the content originates from O'Reilly's (<a href="http://chimera.labs.oreilly.com/books/1230000000345">Interactive Data Visualization for the Web</a>.) In this case, the content is already available free of charge (and for which I own both the printed and ebook versions) but it illustrates a point: Unless you're serving your content behind authentication a serviceworker can do whatever it wants with it. The cache will not expire untl you install a newer version and the content will remain in the cached as long as the cache lives.</p>
+
+<p>It follows the "with serviceworker comes great responsibility" theme regarding serviceworkers or, as Jake Archibald puts it, "Serviceworker treats you like an adult". The Serviceworker will allow you to do a lot of things but you're responsible for what you do with it. </p>
+</article>
+
+    </sidebar-layout>
+  </body>
+</html>
