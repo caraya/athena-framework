@@ -9,7 +9,7 @@
 importScripts('js/serviceworker-cache-polyfill.js');
 
 var CACHE_NAME = 'athena-demo';
-var CACHE_VERSION = 5;
+var CACHE_VERSION = 1;
 
 self.oninstall = function(event) {
 debugger;
@@ -75,8 +75,7 @@ debugger;
             cache.put(request, responseToCache)
             console.log('put file on cache: ' + request);
             .catch(function(err) {
-              // Likely we got an opaque response which the polyfill
-              // can't deal with, so log out a warning.
+              // Likely we got an opaque response which the polyfill can't deal with, so log out a warning.
               console.warn(requestURL + ': ' + err.message);
             });
           });
