@@ -4,24 +4,96 @@
  * @email carlos.araya@gmail.com
  *
  * Serviceworker for the demonstration athena publication.
- */
+ *
+ * Based (and liberally stolen from Jake Archibald's Trainer to thrill)
+ *
+ * */
 
-// This polyfill provides Cache.add(), Cache.addAll(),
-// and CacheStorage.match(), which are not implemented in Chrome 40.
 importScripts('js/serviceworker-cache-polyfill.js');
-// The SW will be shutdown when not in use to save memory,
-// be aware that any global state is likely to disappear
-console.log("SW startup");
 
-self.addEventListener('install', function(event) {
-  console.log("SW installed");
-});
+var CACHE_NAME = 'athena-demo';
+var CACHE_VERSION = 1;
 
-self.addEventListener('activate', function(event) {
-  console.log("SW activated");
-});
+self.oninstall = function(event) {
+  event.waitUntil(
+    caches.open(CACHE_NAME + '-v' + CACHE_VERSION).then(function(cache) {
+      return cache.addAll([
+        '/athena-framework/',
+        '/athena-framework/css/',
+        '/athena-framework/js/',
+        '/athena-framework/bower_components/',
+        '/athena-framework/content/',
+        '/athena-framework/notes.html',
+        '/athena-framework/index.html'
+      ]);
+    })
+  );
+};
 
-self.addEventListener('fetch', function(event) {
-  console.log("Caught a fetch!");
-  event.respondWith(new Response("Hello world!"));
-});
+self.onactivate = function(event) {
+
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (expectedCaches.indexOf(cacheName) == -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+};
+
+self.onactivate = function(event) {
+
+  var currentCacheName = CACHE_NAME + '-v' + CACHE_VERSION;
+  caches.keys().then(function(cacheNames) {
+    return Promise.all(
+      cacheNames.map(function(cacheName) {
+        if (cacheName.indexOf(CACHE_NAME) == -1) {
+          return;
+        }
+
+        if (cacheName != currentCacheName) {
+          return caches.delete(cacheName);
+        }
+      })
+    );
+  });
+
+};
+
+self.onfetch = function(event) {
+  var request = event.request;
+  var requestURL = new URL(event.request.url);
+
+  event.respondWith(
+
+    // Check the cache for a hit.
+    caches.match(request).then(function(response) {
+
+      // If we have a response return it.
+      if (response)
+        return response;
+
+      // Otherwise fetch it, store and respond.
+      return fetch(request).then(function(response) {
+
+        var responseToCache = response.clone();
+
+        caches.open(CACHE_NAME + '-v' + CACHE_VERSION).then(
+          function(cache) {
+            cache.put(request, responseToCache).catch(function(err) {
+              // Likely we got an opaque response which the polyfill
+              // can't deal with, so log out a warning.
+              console.warn(requestURL + ': ' + err.message);
+            });
+          });
+
+        return response;
+      });
+
+    })
+  );
+};
