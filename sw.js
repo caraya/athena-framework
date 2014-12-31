@@ -26,7 +26,7 @@ self.oninstall = function(event) {
 
         '/athena-framework/content/',
         '/athena-framework/index.html',
-        '/athena-framework/notes.html';
+        '/athena-framework/notes.html'
       ]);
     })
   );
