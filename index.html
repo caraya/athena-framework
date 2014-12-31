@@ -53,13 +53,35 @@ if (navigator.serviceWorker.register) {
 
 <body unresolved>
   <sidebar-layout selected="home">
-    <div class="title">Home</div>
-
-    <h2>Example Athena Publication</h2>
+    <div class="title">About the demo</div>
 
     <p>This is an example of what Athena may look like.</p>
 
-    <p>It uses <a href="https://www.polymer-project.org/">Polymer</a> web components </p>
+    <p>It uses <a href="https://www.polymer-project.org/">Polymer</a> web components as the UI and a Serviceworker to handle offline access and, in the future, push notifications and Background synchronization.</p>
+
+    <p>It is not a completed project. There are many thing we have left to do to fully validate the web-based publishing process. Some of those things are:</p>
+
+    <ul>
+      <li>Better typography
+        <ul>
+          <li>Pick a different font</li>
+          <li>Set up font size, line height and headings</li>
+        </ul></li>
+      <li>Try other web experiments
+        <ul>
+          <li>D3 visualizations</li>
+          <li>WebGL</li>
+          <li>WebRTC</li>
+        </ul></li>
+    </ul>
+
+    <h3>Project Content</h3>
+
+    <p>The first section, Athena Concept, contains both the <a href="notes.html">rationale</a> for the project as well as some technologies used or proposed to be used with the project.</p>
+
+    <p>The second section, External Content Test, is an attempt to test if we can cache external content as part of our service worker.</p>
+
+    <p>The final section, Peter Pan Text, contains the 17 chapters of <a href="http://www.gutenberg.org/files/26654/26654-h/26654-h.htm">Peter and Wendy</a> from the <a href="http://www.gutenberg.org/wiki/Main_Page">Gutenberg Project</a></p>
   </sidebar-layout>
 </body>
 
