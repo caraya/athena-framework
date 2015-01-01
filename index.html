@@ -7,44 +7,51 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <title>Athena Sample Application</title>
   <script>
+    // force https
+    if ((!location.port || location.port == "80") && location.protocol != 'https:') {
+      location.protocol = 'https:';
+    }
+
     // Loads webcomponents.js only if the browser doesn't support the webcomponent specs
-if ('registerElement' in document
-    && 'createShadowRoot' in HTMLElement.prototype
-    && 'import' in document.createElement('link')
-    && 'content' in document.createElement('template')) {
-  // web component technologies supported log to console
-  console.log('web components supported');
-} else {
-  // web component technologies NOT supported log to console and write script tag
-  console.log('polyfill needed, writing script tag dynamically');
-  document.write('<script src="bower_components/webcomponentsjs/webcomponents.js"><\/script>');
-}
+    if ('registerElement' in document
+        && 'createShadowRoot' in HTMLElement.prototype
+        && 'import' in document.createElement('link')
+        && 'content' in document.createElement('template')) {
+      // web component technologies supported log to console
+      console.log('web components supported');
+    } else {
+      // web component technologies NOT supported log to console and write script tag
+      console.log('polyfill needed, writing script tag dynamically');
+      document.write('<script src="bower_components/webcomponentsjs/webcomponents.js"><\/script>');
+    }
 
-// Make sure we're on https as serviceworkers will only work on secure connections
-
-
-// Register Serviceworker
-if (navigator.serviceWorker.register) {
-  // If Serviceworker is supported then register it
-  // and log to console whether the promise fulfilled or rejected
-  //
-  // move the serviceworker to the root of the app to comply
-  // https://github.com/slightlyoff/ServiceWorker/issues/468
-  navigator.serviceWorker.register('sw.js', {
-    // Scope the serviceworker to match our application path
-    scope: '/athena-framework/'
-  }).then(function(reg) {
-    // Promise fullfilled
-    console.log('success', reg);
-  }, function (err){
-    // Promise rejected
-    console.log('oh sh*t', err);
-  });
-} else {
-  // Serviceworker is not supported. We may want to
-  // write something to screen in addition to logging it
-  console.log('serviceWorker not supported');
-}
+    // Make sure we're on https as serviceworkers will only work on secure connections
+    // force https
+    if ((!location.port || location.port == "80") && location.protocol != 'https:') {
+      location.protocol = 'https:';
+    }
+    // Register Serviceworker
+    if (navigator.serviceWorker.register) {
+      // If Serviceworker is supported then register it
+      // and log to console whether the promise fulfilled or rejected
+      //
+      // move the serviceworker to the root of the app to comply
+      // https://github.com/slightlyoff/ServiceWorker/issues/468
+      navigator.serviceWorker.register('sw.js', {
+        // Scope the serviceworker to match our application path
+        scope: '/athena-framework/'
+      }).then(function(reg) {
+        // Promise fullfilled
+        console.log('success', reg);
+      }, function (err){
+        // Promise rejected
+        console.log('oh sh*t', err);
+      });
+    } else {
+      // Serviceworker is not supported. We may want to
+      // write something to screen in addition to logging it
+      console.log('serviceWorker not supported');
+    }
   </script>
   <link rel="stylesheet" href="css/styles.css" shim-shadowdom>
   <link rel="import" href="bower_components/polymer/polymer.html">

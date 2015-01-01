@@ -9,7 +9,7 @@
 importScripts('js/serviceworker-cache-polyfill.js');
 
 var CACHE_NAME = 'athena-demo';
-var CACHE_VERSION = 8;
+var CACHE_VERSION = 9;
 
 self.oninstall = function(event) {
 
